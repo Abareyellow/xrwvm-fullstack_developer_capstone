@@ -40,7 +40,7 @@ urlpatterns = [
     # path for login
     path(
         route='login',
-        view=views.login_user, 
+        view=views.login_user,
         name='login'
     ),
 

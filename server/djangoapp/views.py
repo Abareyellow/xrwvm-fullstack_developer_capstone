@@ -65,9 +65,10 @@ def registration(request):
         # Check if user already exists
         User.objects.get(username=username)
         username_exist = True
-    except:
+    except Exception as e:
         # If not, simply log this is a new user
         logger.debug("{} is new user".format(username))
+        print(e)
 
     # If it is a new user
     if not username_exist:
@@ -82,16 +83,17 @@ def registration(request):
         # Login the user and redirect to list page
         login(request, user)
         data = {
-            "userName": username, 
-            "status":"Authenticated"
+            "userName": username,
+            "status": "Authenticated"
         }
         return JsonResponse(data)
-    else :
+    else:
         data = {
-            "userName": username, 
+            "userName": username,
             "error": "Already Registered"
         }
         return JsonResponse(data)
+
 
 def get_cars(request):
     count = CarMake.objects.filter().count()
@@ -110,7 +112,6 @@ def get_cars(request):
     return JsonResponse({"CarModels": cars})
 
 
-#Update the `get_dealerships` render list of dealerships all by default, particular state if state is passed
 def get_dealerships(request, state="All"):
     if (state == "All"):
         endpoint = "/fetchDealers"
@@ -137,15 +138,15 @@ def get_dealer_reviews(request, dealer_id):
             review_detail['sentiment'] = response['sentiment']
         return JsonResponse(
             {
-                "status":200,
-                "reviews":reviews
+                "status": 200,
+                "reviews": reviews
             }
         )
     else:
         return JsonResponse(
             {
                 "status": 400,
-                "message":"Bad Request"
+                "message": "Bad Request"
             }
         )
 
@@ -172,17 +173,19 @@ def get_dealer_details(request, dealer_id):
 
 # Create a `add_review` view to submit a review
 def add_review(request):
-    if (request.user.is_anonymous == False):
+    if (request.user.is_anonymous is False):
         data = json.loads(request.body)
         try:
             response = post_review(data)
+            print(response)
             return JsonResponse({"status": 200})
-        except:
+        except Exception as e:
+            print(e)
             return JsonResponse(
                 {
-                    "status": 401, 
+                    "status": 401,
                     "message": "Error in posting review"
-              }
+                }
             )
     else:
         return JsonResponse(
